@@ -147,12 +147,13 @@ if "output" in st.session_state:
 
             choice = st.radio(
                 "Select answer:",
-                options,
+                ["Select answer"] + options,
                 key=f"q{i}"
             )
 
             if st.session_state.get("submitted"):
-                if choice.lower().startswith(correct):
+
+                if choice != "Select answer" and choice.lower().startswith(correct):
                     st.success("✅ Correct")
                     score += 1
                 else:
@@ -161,11 +162,25 @@ if "output" in st.session_state:
             st.markdown("---")
 
         if not st.session_state.get("submitted"):
+
             if st.button("Submit Quiz"):
-                st.session_state.submitted = True
-                st.rerun()
+
+                unanswered = False
+
+                for i in range(len(questions)):
+                    if st.session_state.get(f"q{i}") == "Select answer":
+                        unanswered = True
+
+                if unanswered:
+                    st.warning("⚠️ Please answer all questions before submitting.")
+                else:
+                    st.session_state.submitted = True
+                    st.rerun()
+
         else:
+
             percentage = (score / len(questions)) * 100 if questions else 0
+
             st.success(f"🏆 Score: {score} / {len(questions)}")
             st.info(f"📊 Percentage: {percentage:.2f}%")
 
